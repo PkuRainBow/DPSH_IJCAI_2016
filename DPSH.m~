@@ -1,0 +1,23 @@
+function [B_p,B_test,map] = DPSH(codelens)
+
+%% load the pre-trained CNN
+net = load('imagenet-vgg-f.mat') ;
+%% load the Dataset
+load('cifar-10.mat') ;
+%%
+maxIter = 200;
+lr = 1e-2 ;
+net = net_structure (net, codelens);
+U = zeros(size(train_data,4),codelens);
+
+for iter = 1: maxIter
+    [net,U] = train(train_data,train_L,U,net,iter,lr,map_best) ;
+    if mod(iter,20)==0
+        lr = lr/1.5;
+    end
+end
+S = compute_S(pL,test_L) ;
+[B_p, B_test] = compute_B (datap,test_data,net) ;
+map = test (B_p, B_test, S) ;
+% fprintf(' MAP in the test set is %.4f\n', map) ;
+end
